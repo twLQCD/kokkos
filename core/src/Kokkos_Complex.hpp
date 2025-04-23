@@ -29,6 +29,7 @@
 #include <type_traits>
 #include <iosfwd>
 #include <tuple>
+#include <concepts>
 
 namespace Kokkos {
 
@@ -39,6 +40,10 @@ namespace Kokkos {
 ///   complex number.  As with std::complex, this is only defined for
 ///   \c float, \c double, and <tt>long double</tt>.  The latter is
 ///   currently forbidden in CUDA device kernels.
+
+template <class RealType1, class RealType2>
+concept is_Kokkos_floating_point = std::floating_point<RealType1> && std::floating_point<RealType2>;
+
 template <class RealType>
 class
 #ifdef KOKKOS_ENABLE_COMPLEX_ALIGN
@@ -675,6 +680,7 @@ KOKKOS_INLINE_FUNCTION complex<RealType> operator-(
 
 //! Binary * operator for complex.
 template <class RealType1, class RealType2>
+requires is_Kokkos_floating_point<RealType1,RealType2>
 KOKKOS_INLINE_FUNCTION complex<std::common_type_t<RealType1, RealType2>>
 operator*(const complex<RealType1>& x, const complex<RealType2>& y) noexcept {
   return complex<std::common_type_t<RealType1, RealType2>>(
@@ -691,6 +697,7 @@ operator*(const complex<RealType1>& x, const complex<RealType2>& y) noexcept {
 /// std::complex's methods and nonmember functions are not marked as
 /// CUDA device functions.
 template <class RealType1, class RealType2>
+requires is_Kokkos_floating_point<RealType1,RealType2>
 inline complex<std::common_type_t<RealType1, RealType2>> operator*(
     const std::complex<RealType1>& x, const complex<RealType2>& y) {
   return complex<std::common_type_t<RealType1, RealType2>>(
@@ -703,6 +710,7 @@ inline complex<std::common_type_t<RealType1, RealType2>> operator*(
 /// This function exists because the compiler doesn't know that
 /// RealType and complex<RealType> commute with respect to operator*.
 template <class RealType1, class RealType2>
+requires is_Kokkos_floating_point<RealType1,RealType2>
 KOKKOS_INLINE_FUNCTION complex<std::common_type_t<RealType1, RealType2>>
 operator*(const RealType1& x, const complex<RealType2>& y) noexcept {
   return complex<std::common_type_t<RealType1, RealType2>>(x * y.real(),
@@ -714,6 +722,7 @@ operator*(const RealType1& x, const complex<RealType2>& y) noexcept {
 /// This function exists because the compiler doesn't know that
 /// RealType and complex<RealType> commute with respect to operator*.
 template <class RealType1, class RealType2>
+requires is_Kokkos_floating_point<RealType1,RealType2>
 KOKKOS_INLINE_FUNCTION complex<std::common_type_t<RealType1, RealType2>>
 operator*(const complex<RealType1>& y, const RealType2& x) noexcept {
   return complex<std::common_type_t<RealType1, RealType2>>(x * y.real(),
